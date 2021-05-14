@@ -1,14 +1,25 @@
 {
-    "colors": "kleuren",
-    "black": "zwart",
-    "blue": "blauw",
-    "brown": "bruin",
-    "gray": "grijs",
-    "green": "groen",
-    "orange": "oranje",
-    "purple": "paars",
-    "red": "rood",
-    "white": "wit",
-    "yellow": "geel",
-    "test": "test"
+    "1": {
+        "Ms/Mrs": "mevrouw",
+        "live": "woont",
+        "also": "ook",
+        "in": "in",
+        "call(say)": "zeg",
+        "but(just)": "maar",
+        "yes": "ja",
+        "here": "hier",
+        "already": "al",
+        "twenty": "twintig",
+        "the year": "het jaar",
+        "go on (continue)": "gaan verder",
+        "the lesson": "de les",
+        "has": "heef",
+        "everyone": "iedereen",
+        "the book": "het boek",
+        "the": "het",
+        "the cd":"de cd",
+        "the text": "de tekst",
+        "emphasis":"hoor"
+    }
 }
+
