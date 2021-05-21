@@ -1,11 +1,11 @@
 import random
 import json
+from learned import ProgressHandler
 
 QUIT = "quit()"
 
 total_attempts = 0
 total_correct = 0
-words_learned = set()
 
 
 def print_session_stats():
@@ -15,7 +15,6 @@ def print_session_stats():
         total attempts: {total_attempts}\n
         correct answers: {total_correct}\n
         correct answers %: {correct_p}%\n
-        words learned: {len(words_learned)} ({words_learned})
     """)
 
 
@@ -23,6 +22,7 @@ def print_session_stats():
 with open('words.json') as json_file:
     dictionary = json.load(json_file)
     num_dict = list(enumerate(dictionary.keys()))
+    handler = ProgressHandler(dictionary)
 
 try:
     # Handle categories
@@ -30,7 +30,7 @@ try:
     while _contionue_categories:
         print("Select a category from the following:")
         for num, category in num_dict:
-            print(f"{num}. {category} ({len(dictionary.get(category))})")
+            print(f"{num}. {category}\t\t({len(dictionary.get(category))} w,\t{handler.get_progress(category)} %)")
         words = []
         while not words:
             try:
@@ -65,7 +65,7 @@ try:
                     print("Correct!\n")
                     score += 1
                     total_correct += 1
-                    words_learned.add(translation_input)
+                    handler.update_word(key)
                 else:
                     print(f"Wrong: {correct_answer.upper()}\n")
                     wrong_words.append((key, translation_input))
@@ -74,7 +74,7 @@ try:
             # Results
             total_words = len(wrong_words) + score
             score_p = int(score * 100/total_words) if total_words else 0
-            print(f"\n\n*****************************\nDone! Your score is: {score}/{total_words} ({score_p}%)")
+            print(f"\n\n*****************************\nDone! Your score is: {score}/{total_words} ({score_p}%)\nYou learned {handler.get_progress(selected_category)} % words in this category.")
 
             if len(wrong_words):
                 print("\n\nHere are the words that you got wrong:\n")
@@ -95,5 +95,5 @@ try:
                 else:
                     continue
 except KeyboardInterrupt:
+    handler.dump_data()
     print_session_stats()
-
