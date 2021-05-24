@@ -65,10 +65,11 @@ try:
                     print("Correct!\n")
                     score += 1
                     total_correct += 1
-                    handler.update_word(key)
+                    handler.update_score(key)
                 else:
                     print(f"Wrong: {correct_answer.upper()}\n")
                     wrong_words.append((key, translation_input))
+                    handler.update_score(key, correct=False)
                 total_attempts += 1
 
             # Results
