@@ -1,11 +1,14 @@
 import json
+import os
 
-LEARNED_WORDS_FILE = 'learned_words.json'
+LEARNED_WORDS_FILE = '/learned_words.json'
 LEARNED_WORDS = "learned_words"
 CATEGORY_SCORE = "categories_score"
 LEARNED_THRESHOLD = 10
 MAX_SCORE = 12
 MIN_SCORE = 0
+
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 class ProgressHandler():
 
@@ -14,13 +17,13 @@ class ProgressHandler():
         self.load_data()
 
     def load_data(self):
-        with open(LEARNED_WORDS_FILE) as json_file:
+        with open(__location__ + LEARNED_WORDS_FILE) as json_file:
             self.json_data = json.load(json_file)
             self.words = self.json_data[LEARNED_WORDS]
             self.categories = self.json_data[CATEGORY_SCORE]
            
     def dump_data(self):
-        with open(LEARNED_WORDS_FILE, "w") as jsonFile:
+        with open(__location__ + LEARNED_WORDS_FILE, "w") as jsonFile:
             self.json_data[LEARNED_WORDS] = self.words
             self.json_data[CATEGORY_SCORE] = self.categories
             json.dump(self.json_data, jsonFile, sort_keys=True, indent=4)
@@ -39,24 +42,36 @@ class ProgressHandler():
                 del self.words[word]
         self.dump_data()
 
+    def get_progress(self, category, target=LEARNED_THRESHOLD):
+        _words = self.dictionary.get(category).keys()
+        score = 0
+        for word in self.words.keys():
+            if word in _words:
+                word_score = self.words.get(word)
+                if word_score and word_score >= MIN_SCORE:
+                    if word_score and word_score >= target:
+                        score += 1
+                    else:
+                        score += (word_score/target)
+        if score:
+            return "%.1f" % (score*100/len(_words))
+
     def update_progress(self):
         for category in self.dictionary:
-            _words = self.dictionary.get(category).keys()
-            score = 0
-            for word in self.words.keys():
-                if word in _words:
-                    word_score = self.words.get(word)
-                    if word_score and word_score >= MIN_SCORE:
-                        if word_score and word_score >= LEARNED_THRESHOLD:
-                            score += 1
-                        else:
-                            score += (word_score/LEARNED_THRESHOLD)
-            if score:
-                self.categories[category] = "%.1f" % (score*100/len(_words))
+            cat_score = self.get_progress(category)
+            if cat_score:
+                self.categories[category] = cat_score
         self.dump_data()
 
+    def get_category_progress(self, category, target=LEARNED_THRESHOLD):
+        return self.get_progress(category, target=target) or MIN_SCORE
 
-    def get_progress(self, category):
+    def get_update_category_progress(self, category):
         self.update_progress()
         progress = self.categories.get(category)
+        return progress or MIN_SCORE
+
+    def get_word_progress(self, word):
+        self.update_progress()
+        progress = self.words.get(word)
         return progress or MIN_SCORE
